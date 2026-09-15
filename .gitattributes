@@ -1,0 +1,5 @@
+# Anchors are stored byte-for-byte as the endpoint serves them (LF). Never convert them.
+anchors/** -text
+*.py  text eol=lf
+*.yml text eol=lf
+*.md  text eol=lf

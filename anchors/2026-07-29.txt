@@ -1,0 +1,6 @@
+AnchorDate=2026-07-29
+HeadSeqNo=7
+HeadHash=74726c0545154c3dd31c9bd8c10a1eeaa6ff6fae8849062fd92ef0f40dfd214d
+EntryCount=7
+ScoringRuleVersion=v1
+AnchoredAtUtc=2026-07-29T10:06:04.6633333Z

@@ -1,0 +1,50 @@
+name: witness
+
+# Twice a day, every day. The ledger publishes its anchor once per weekday morning (06:00 ET);
+# the second run catches a late or re-issued anchor, and runs with nothing new commit nothing.
+on:
+  schedule:
+    - cron: "17 13 * * *"
+    - cron: "17 22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: witness
+  cancel-in-progress: false
+
+jobs:
+  witness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch and check the latest anchor
+        id: fetch
+        run: |
+          set +e
+          python3 scripts/witness.py
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+
+      # Commits on an integrity alarm too (exit 2): the evidence is kept, then the run fails below.
+      - name: Commit the anchor if it changed
+        if: steps.fetch.outputs.code == '0' || steps.fetch.outputs.code == '2'
+        run: |
+          if [ -n "$(git status --porcelain -- anchors)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add anchors
+            git commit -m "witness: ${{ steps.fetch.outputs.summary }}"
+            git push
+          else
+            echo "No new anchor."
+          fi
+
+      - name: Fail the run on an integrity alarm or a fetch error
+        if: steps.fetch.outputs.code != '0'
+        run: |
+          echo "witness.py exited ${{ steps.fetch.outputs.code }} (1 = could not fetch or parse, 2 = integrity alarm) — see the first step's log."
+          exit 1
