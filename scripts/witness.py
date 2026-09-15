@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Witness the TradeBotAlpha Signal Ledger anchor.
 
-Fetches the public anchor digest, stores it byte-for-byte as anchors/<AnchorDate>.txt, and checks it
+Fetches the public anchor digest, stores it byte-for-byte as anchors/anchor-<AnchorDate>.txt, and checks it
 against every anchor already witnessed here. Standard library only.
 
 Exit codes: 0 = ok (changed or not), 1 = could not fetch or parse (nothing written),
@@ -76,8 +76,8 @@ def read_exact(path):
 
 def stored():
     result = {}
-    for p in sorted(ANCHORS.glob("*.txt")):
-        result[p.stem] = parse(read_exact(p))
+    for p in sorted(ANCHORS.glob("anchor-*.txt")):
+        result[p.stem.removeprefix("anchor-")] = parse(read_exact(p))
     return result
 
 
@@ -96,7 +96,7 @@ def check(new, others):
 
 def witness(text, report):
     anchor = parse(text)
-    path = ANCHORS / f"{anchor['AnchorDate']}.txt"
+    path = ANCHORS / f"anchor-{anchor['AnchorDate']}.txt"
     existing = stored()
     alarms = check(anchor, {d: a for d, a in existing.items() if d != anchor["AnchorDate"]})
 

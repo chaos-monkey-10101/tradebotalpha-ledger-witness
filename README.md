@@ -23,7 +23,8 @@ this repository.
 ## How it works
 
 - `.github/workflows/witness.yml` runs twice a day. It fetches the latest anchor and commits it,
-  byte-for-byte, as `anchors/<AnchorDate>.txt` whenever it is new or changed.
+  byte-for-byte, as `anchors/anchor-<AnchorDate>.txt` (the same name the ledger's own
+  anchor file uses) whenever it is new or changed.
 - `scripts/witness.py` checks every anchor against every anchor already witnessed. The run
   **fails** if:
   - the head moves backwards, or the entry count drops;
