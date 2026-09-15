@@ -68,10 +68,16 @@ def fetch(url):
     raise RuntimeError(f"could not fetch {url}: {last}")
 
 
+def read_exact(path):
+    # Exactly as stored: no newline translation (Path.read_text only takes newline= from 3.13).
+    with open(path, encoding="utf-8", newline="") as f:
+        return f.read()
+
+
 def stored():
     result = {}
     for p in sorted(ANCHORS.glob("*.txt")):
-        result[p.stem] = parse(p.read_text(encoding="utf-8", newline=""))
+        result[p.stem] = parse(read_exact(p))
     return result
 
 
@@ -95,7 +101,7 @@ def witness(text, report):
     alarms = check(anchor, {d: a for d, a in existing.items() if d != anchor["AnchorDate"]})
 
     if anchor["AnchorDate"] in existing:
-        previous = path.read_text(encoding="utf-8", newline="")
+        previous = read_exact(path)
         if previous == text:
             report.append(f"{anchor['AnchorDate']}: already witnessed (head {anchor['HeadSeqNo']})")
             return alarms
@@ -107,7 +113,8 @@ def witness(text, report):
         report.append(f"{anchor['AnchorDate']}: witnessed head {anchor['HeadSeqNo']} ({anchor['EntryCount']} entries) {anchor['HeadHash'][:12]}")
 
     ANCHORS.mkdir(exist_ok=True)
-    path.write_text(text, encoding="utf-8", newline="")
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        f.write(text)
     return alarms
 
 
