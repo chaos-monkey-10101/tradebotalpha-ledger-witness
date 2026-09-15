@@ -42,6 +42,23 @@ this repository.
 - **What proves the timing.** Git commit dates are set by whoever commits. The timing evidence is
   this repository's public history and GitHub's record of each scheduled run.
 - **Verifying the chain itself needs more than this repo.** It needs the ledger rows and the
-  verification method, which will be published with the public track record. That includes the
-  timestamp correction list for entries written before a September 2026 fix to how the ledger
-  stored timestamps.
+  verification method, which will be published with the public track record. The timestamp
+  correction list that verification needs is already here (see below).
+
+## Timestamp corrections
+
+`corrections/v1-timestamp-corrections.csv` covers ledger entries 1–32. Until a fix went live on
+2026-09-15, the ledger hashed each entry's publish time at full precision but stored it rounded to
+SQL Server `datetime` precision (1/300 s). Those 32 entries therefore don't re-hash from their stored
+timestamp.
+
+Each line gives an entry's hash, its stored timestamp, and the timestamp it was actually hashed
+with. A verifier uses the listed timestamp for those entries; every later entry must verify exactly
+as stored.
+
+- **Final.** SeqNo 32 is the last entry written before the fix. The list will never grow.
+- **Nothing to take on trust.** Every listed timestamp falls in its stored value's 1/300 s tick.
+  Anyone with the rows can re-derive it by trying the roughly 33,000 candidates in that tick until
+  one reproduces the hash.
+- **Consistent with the witnessed record.** Every head hash in `anchors/` matches the hash the list
+  records for that entry (49 anchors, 17 distinct heads).

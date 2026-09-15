@@ -3,3 +3,4 @@ anchors/** -text
 *.py  text eol=lf
 *.yml text eol=lf
 *.md  text eol=lf
+corrections/** -text
