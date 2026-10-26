@@ -1,0 +1,6 @@
+AnchorDate=2026-10-26
+HeadSeqNo=105
+HeadHash=003dec062d0a6e54a34a2ae16108ab25777ea70c4ef0e10523fd60623edd67f9
+EntryCount=105
+ScoringRuleVersion=v1
+AnchoredAtUtc=2026-10-26T10:06:49.8565825Z
